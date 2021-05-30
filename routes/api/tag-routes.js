@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const { regexp } = require("sequelize/types/lib/operators");
 const { Tag, Product, ProductTag } = require("../../models");
 
 // The `/api/tags` endpoint
@@ -67,8 +68,33 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", async (req, res) => {
   // update a tag's name by its `id` value
+  try {
+    if (req.body.tag_name) {
+      const updatedTag = await Tag.update(
+        {
+          tag_name: req.body.tag_name,
+        },
+        {
+          where: {
+            id: req.params.id,
+          },
+        }
+      );
+
+      if (updatedTag === 0) {
+        res.status(404).json({ error: "Tag does not exist" });
+      } else {
+        res.json({ success: true });
+      }
+    } else {
+      res.status(400).json({ error: "tag_name is required" });
+    }
+  } catch (err) {
+    console.log(`[ERROR] - ${err.message}`);
+    res.status(500).json({ error: "Failed to update tag" });
+  }
 });
 
 router.delete("/:id", (req, res) => {
