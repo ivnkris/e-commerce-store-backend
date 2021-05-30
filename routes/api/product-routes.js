@@ -149,7 +149,7 @@ router.delete("/:id", async (req, res) => {
     }
   } catch (err) {
     console.log(`[ERROR] - ${err.message}`);
-    res.status(500).json({ error: "Failed to delete product " });
+    res.status(500).json({ error: "Failed to delete product" });
   }
 });
 
