@@ -50,8 +50,21 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   // create a new category
+  try {
+    if (req.body.category_name) {
+      const newCategory = await Category.create({
+        category_name: req.body.category_name,
+      });
+      res.json(newCategory);
+    } else {
+      res.status(400).json({ error: "category_name is required" });
+    }
+  } catch (err) {
+    console.log(`[ERROR] - ${err.message}`);
+    res.status(500).json({ error: "Failed to create category" });
+  }
 });
 
 router.put("/:id", (req, res) => {
