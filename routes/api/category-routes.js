@@ -67,7 +67,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", async (req, res) => {
   // update a category by its `id` value
   try {
     if (req.body.category_name) {
@@ -96,8 +96,23 @@ router.put("/:id", (req, res) => {
   }
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", async (req, res) => {
   // delete a category by its `id` value
+  try {
+    const affectedCategory = await Category.destroy({
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (affectedCategory === 0) {
+      res.status(404).json({ error: "Category does not exist" });
+    } else {
+      res.json({ success: true });
+    }
+  } catch (err) {
+    console.log(`[ERROR] - ${err.message}`);
+    res.status(500).json({ error: "Failed to delete category" });
+  }
 });
 
 module.exports = router;
