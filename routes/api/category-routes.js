@@ -69,6 +69,31 @@ router.post("/", async (req, res) => {
 
 router.put("/:id", (req, res) => {
   // update a category by its `id` value
+  try {
+    if (req.body.category_name) {
+      const updatedCategory = await Category.update(
+        {
+          category_name: req.body.category_name,
+        },
+        {
+          where: {
+            id: req.params.id,
+          },
+        }
+      );
+
+      if (updatedCategory === 0) {
+        res.status(404).json({ error: "Category does not exist" });
+      } else {
+        res.json({ success: true });
+      }
+    } else {
+      res.status(400).json({ error: "category_name is required" });
+    }
+  } catch (err) {
+    console.log(`[ERROR] - ${err.message}`);
+    res.status(500).json({ error: "Failed to update category" });
+  }
 });
 
 router.delete("/:id", (req, res) => {
