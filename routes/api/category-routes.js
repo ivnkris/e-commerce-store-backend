@@ -22,9 +22,32 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", (req, res) => {
+router.get("/:id", async (req, res) => {
   // find one category by its `id` value
   // be sure to include its associated Products
+  try {
+    const category = await Category.findOne({
+      where: {
+        id: req.params.id,
+      },
+      include: [
+        {
+          model: Product,
+          attributes: ["product_name", "price", "stock"],
+        },
+      ],
+    });
+    if (!category) {
+      res.status(404).json({
+        error: "Category does not exist",
+      });
+    } else {
+      res.json(category);
+    }
+  } catch (err) {
+    console.log(`[ERROR] - ${err.message}`);
+    res.status(500).json({ error: "Failed to get category" });
+  }
 });
 
 router.post("/", (req, res) => {
